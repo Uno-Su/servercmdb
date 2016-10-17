@@ -1,47 +1,76 @@
-from django.shortcuts import render, render_to_response
-from django.http import HttpResponse
-from django.contrib.auth import login, authenticate, logout
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from polls.models import User
+from polls.api import salt_crypt
+
 # Create your views here.
 
 
-def index(request):
-    return HttpResponse("Hello Index!")
-
-
-def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
-
-
-def results(request, question_id):
-    response = "You're looking at the results of question %s."
-    return HttpResponse(response % question_id)
-
-
-def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)
-
-@csrf_exempt
 def Login(request):
     error = ""
+    users = User.objects.all()
     if request.method == 'GET':
-        return render_to_response('login.html',locals())
+
+        return render(request, 'login.html')
     else:
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(password)
-        print(username)
         if username and password:
-            user = authenticate(username=username, password=password)
-            print(user)
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return render_to_response("index.html")
+            try:
+                user = User.objects.get(username=username)
+                if user.username == username and user.password == salt_crypt(password, "mysalt"):
+
+                    request.session['login'] = True
+                    response = render(request, 'index.html', {'users': users})
+                    response.set_cookie('status', 'login')
+                    return response
                 else:
-                    error = "User is not active"
-            else:
+                    error = "user or password error "
+            except User.DoesNotExist:
                 error = "user is not existed"
+    return render(request, 'login.html', {'error': error})
+
+
+@login_required(login_url='/login/')
+def index(request):
+    users = User.objects.all()
+    return render(request, 'index.html', {'users': users})
+
+
+def Logout(request):
+    # logout(request)
+    request.session.flush()
+    return redirect(reverse("login"))
+
+
+def signup(request):
+    error = ""
+    if request.method == 'GET':
+        return render(request, 'signup.html')
+    elif request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email', '')
+        password = request.POST.get('password')
+        repassword = request.POST.get('repassword')
+        print(username)
+        print(email)
+        print(password)
+        print(repassword)
+        if password != repassword:
+            error = "两次输入的密码不同"
         else:
-            error = "user or password error "
-    return render_to_response('login.html', {'error': error})
+            db_user = User.objects.filter(username=username)
+            print(db_user)
+            if User.objects.filter(username=username):
+                error = "用户名%s已存在" % username
+            else:
+                add_user = User(username=username, email=email, password=salt_crypt(password, "mysalt"))
+                add_user.save()
+                return redirect(reverse('index'))
+    return render(request, 'signup.html', {'error': error})
+
+
+

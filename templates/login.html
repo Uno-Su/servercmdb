@@ -9,19 +9,20 @@
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="http://v3.bootcss.com/favicon.ico">
+    <link rel="icon" href="/statics/img/favicon.ico">
 
-    <title>Signin Template for Bootstrap</title>
+    <title>{% block title %}{% endblock %}</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="/static/css/bootstrap.css" rel="stylesheet">
-
+    <link href="/statics/css/bootstrap.min.css" rel="stylesheet">
+    <!-- fontawsome core CSS -->
+    <link href="/statics/css/font-awesome.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
-    <link href="/static/css/signin.css" rel="stylesheet">
-
+    <link href="/statics/css/signin.css" rel="stylesheet">
+    <link href="/statics/css/font.css" rel="stylesheet">
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="/static/js/ie-emulation-modes-warning.js"></script>
+    <script src="/statics/js/ie-emulation-modes-warning.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -31,31 +32,52 @@
   </head>
 
   <body>
-    <div class="container">
+    {% block container %}
+    <div class="container container-fluid">
 
       <form class="form-signin", method="post">{% csrf_token %}
-        <h2 class="form-signin-heading">请登录</h2>
+        <fieldset>
+        <h1 class="text-center text-info">OMS Server</h1>
+        <div class="navbar">
+            <h2 class=" form-signin-heading text-center" >登录</h2>
+        </div>
+{#        <div class="input-group fa-border margin-bottom-sm">#}
+{#            <input class="form-control" type="email" placeholder="Email address" name="username" required="" autofocus="" >#}
+{#        </div>#}
+{#        <div class="input-group fa-border margin-bottom-sm">#}
+{#            <input class="form-control" type="password" placeholder="Password" name="password" required="">#}
+{#        </div>#}
+
+
+
+
         <label for="inputEmail" class="sr-only">Email address</label>
-        <input id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="" type="email" name="username">
+        <input id="inputEmail" class="form-control" placeholder="请输入您注册时的邮箱" required="" autofocus="" type="email" name="username" >
         <label for="inputPassword" class="sr-only">Password</label>
-        <input id="inputPassword" class="form-control" placeholder="Password" required="" type="password" name="password">
-        <div class="checkbox">
+        <input id="inputPassword" class="form-control" placeholder="请输入您的密码" required="" type="password" name="password" >
+        <div class="input-group checkbox">
           <label>
             <input value="remember-me" type="checkbox"> Remember me
           </label>
           {% if error %}
-            <div>{{ error }} </div>
+            <div class="error-font">{{ error }} </div>
           {% endif %}
 
         </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" >Sign in</button>
+        <div>
+            <a class="pull-right" target="_self" href="{% url 'signup' %}">我还没账户,我需要注册?</a>
+        </div>
+        </fieldset>
       </form>
 
     </div> <!-- /container -->
 
-
+    {% endblock %}
+    {% include 'footer.html' %}
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="/static/js/ie10-viewport-bug-workaround.js"></script>
-  
+    <script src="/statics/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="/statics/js/jquery.js"></script>
+    <script src="/statics/js/bootstrap.min.js"></script>
 
 </body></html>
